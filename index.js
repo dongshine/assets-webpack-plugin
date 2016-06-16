@@ -14,6 +14,10 @@ function AssetsWebpackPlugin (options) {
     prettyPrint: false,
     update: false,
     fullPath: true,
+    //ignore:["underscore"],
+    ignore:[],
+    //sort:["libs","common"]    
+    sort:[], 
     assetsRegex: /\.(jpe?g|png|gif|svg)$/
   }, options)
   this.writer = createQueuedWriter(createOutputWriter(this.options))
@@ -76,7 +80,29 @@ AssetsWebpackPlugin.prototype = {
       }).map(function (asset) {
         return { name: asset.name, path: assetPath + asset.name }
       })
-
+      
+      /* ignore key **************************************************/
+      if(self.options.ignore.length != 0 ){
+          var _ignore = self.options.ignore;
+          for(var j = 0,ignLeng = _ignore.length; j < ignLeng; j++){
+              delete output[_ignore[j]];
+          }
+      }      
+      /* ignore**************************************************/
+      
+      /* sort *****************************************/
+      if(self.options.sort.length != 0 ){
+           var _tmpObj = {},_sort = self.options.sort; 
+           for(var i = 0,sortleng = _sort.length; i < sortleng ;i++){
+               if(output[_sort[i]]){
+                   _tmpObj[_sort[i]] = output[_sort[i]];
+                   delete output[i];
+               } 
+           }            
+           output =  merge(_tmpObj,output);
+      }
+      /* sort *****************************************/
+      
       if (self.options.metadata) {
         output.metadata = self.options.metadata
       }
